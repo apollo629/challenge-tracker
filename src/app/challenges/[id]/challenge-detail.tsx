@@ -156,6 +156,9 @@ export function ChallengeDetail({ challenge }: { challenge: Challenge }) {
           </div>
           {!isEditing && (
             <div className="flex gap-2">
+              <Link href={`/challenges/${challenge.id}/log`}>
+                <Button>Log Progress</Button>
+              </Link>
               <Button variant="outline" onClick={() => setIsEditing(true)}>
                 Edit
               </Button>
@@ -308,7 +311,7 @@ export function ChallengeDetail({ challenge }: { challenge: Challenge }) {
                     <TableCell className="font-medium">{index + 1}</TableCell>
                     <TableCell>
                       <Link
-                        href={`/users/${participant.userId}`}
+                        href={`/users/${participant.userId}/challenges/${challenge.id}`}
                         className="hover:underline"
                       >
                         {participant.user.name}

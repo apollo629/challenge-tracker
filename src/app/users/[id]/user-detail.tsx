@@ -242,7 +242,14 @@ export function UserDetail({ user }: { user: User }) {
               <TableBody>
                 {user.progressLogs.map((log) => (
                   <TableRow key={log.id}>
-                    <TableCell>{log.challenge.title}</TableCell>
+                    <TableCell>
+                      <Link
+                        href={`/users/${user.id}/challenges/${log.challenge.id}`}
+                        className="hover:underline"
+                      >
+                        {log.challenge.title}
+                      </Link>
+                    </TableCell>
                     <TableCell>
                       {new Date(log.date).toLocaleDateString()}
                     </TableCell>
