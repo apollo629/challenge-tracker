@@ -3,14 +3,14 @@ import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
 async function main() {
-  console.log("Seeding database...");
+  // Check if database already has data
+  const userCount = await prisma.user.count();
+  if (userCount > 0) {
+    console.log("Database already seeded, skipping...");
+    return;
+  }
 
-  // Clear existing data
-  await prisma.progressLog.deleteMany();
-  await prisma.teamMember.deleteMany();
-  await prisma.team.deleteMany();
-  await prisma.user.deleteMany();
-  await prisma.challenge.deleteMany();
+  console.log("Seeding database...");
 
   // Create users
   const users = await Promise.all([
@@ -85,8 +85,8 @@ async function main() {
         title: "Read 30 Pages",
         description:
           "Read at least 30 pages of any book every day. Expand your knowledge, improve your focus, and develop a consistent reading habit. Any book counts - fiction, non-fiction, self-help, or technical!",
-        startDate: today,
-        endDate: oneMonthAgo,
+        startDate: oneWeekFromNow,
+        endDate: twoWeeksFromNow,
       },
     }),
     prisma.challenge.create({
