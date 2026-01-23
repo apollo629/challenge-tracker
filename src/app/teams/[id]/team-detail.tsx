@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -59,12 +59,26 @@ type User = {
   name: string;
 };
 
+type Challenge = {
+  id: string;
+  title: string;
+};
+
+type LeaderboardEntry = {
+  rank: number;
+  userId: string;
+  userName: string;
+  totalValue: number;
+};
+
 export function TeamDetail({
   team,
   availableUsers,
+  challenges,
 }: {
   team: Team;
   availableUsers: User[];
+  challenges: Challenge[];
 }) {
   const router = useRouter();
   const [isEditing, setIsEditing] = useState(false);
@@ -72,6 +86,39 @@ export function TeamDetail({
   const [selectedUserId, setSelectedUserId] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
+
+  // Internal leaderboard state
+  const [selectedChallengeId, setSelectedChallengeId] = useState(
+    challenges.length > 0 ? challenges[0].id : ""
+  );
+  const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
+  const [leaderboardLoading, setLeaderboardLoading] = useState(false);
+
+  useEffect(() => {
+    async function fetchLeaderboard() {
+      if (!selectedChallengeId || team.members.length === 0) {
+        setLeaderboard([]);
+        return;
+      }
+
+      setLeaderboardLoading(true);
+      try {
+        const response = await fetch(
+          `/api/teams/${team.id}/leaderboard?challengeId=${selectedChallengeId}`
+        );
+        if (response.ok) {
+          const data = await response.json();
+          setLeaderboard(data.leaderboard);
+        }
+      } catch {
+        // Silently fail - leaderboard is not critical
+      } finally {
+        setLeaderboardLoading(false);
+      }
+    }
+
+    fetchLeaderboard();
+  }, [selectedChallengeId, team.id, team.members.length]);
 
   async function handleUpdate(e: React.FormEvent) {
     e.preventDefault();
@@ -331,6 +378,75 @@ export function TeamDetail({
           )}
         </CardContent>
       </Card>
+
+      {challenges.length > 0 && team.members.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Team Leaderboard</CardTitle>
+            <CardDescription>
+              See how team members rank in each challenge
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="challenge">Challenge</Label>
+              <Select
+                value={selectedChallengeId}
+                onValueChange={setSelectedChallengeId}
+              >
+                <SelectTrigger id="challenge" className="w-full max-w-xs">
+                  <SelectValue placeholder="Select a challenge" />
+                </SelectTrigger>
+                <SelectContent>
+                  {challenges.map((challenge) => (
+                    <SelectItem key={challenge.id} value={challenge.id}>
+                      {challenge.title}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {leaderboardLoading ? (
+              <p className="text-muted-foreground text-sm">
+                Loading leaderboard...
+              </p>
+            ) : leaderboard.length === 0 ? (
+              <p className="text-muted-foreground text-sm">
+                No progress logged for this challenge yet.
+              </p>
+            ) : (
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="w-16">Rank</TableHead>
+                    <TableHead>Name</TableHead>
+                    <TableHead className="text-right">Total Progress</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {leaderboard.map((entry) => (
+                    <TableRow key={entry.userId}>
+                      <TableCell className="font-medium">{entry.rank}</TableCell>
+                      <TableCell>
+                        <Link
+                          href={`/users/${entry.userId}/challenges/${selectedChallengeId}`}
+                          className="hover:underline"
+                        >
+                          {entry.userName}
+                        </Link>
+                      </TableCell>
+                      <TableCell className="text-right">
+                        {entry.totalValue.toLocaleString()}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            )}
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 }

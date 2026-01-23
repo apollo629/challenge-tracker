@@ -159,6 +159,9 @@ export function ChallengeDetail({ challenge }: { challenge: Challenge }) {
               <Link href={`/challenges/${challenge.id}/log`}>
                 <Button>Log Progress</Button>
               </Link>
+              <Link href={`/challenges/${challenge.id}/leaderboard`}>
+                <Button variant="outline">Leaderboard</Button>
+              </Link>
               <Button variant="outline" onClick={() => setIsEditing(true)}>
                 Edit
               </Button>

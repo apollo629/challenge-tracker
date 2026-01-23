@@ -35,20 +35,34 @@ async function getAvailableUsers(teamId: string) {
   });
 }
 
+async function getChallenges() {
+  return prisma.challenge.findMany({
+    orderBy: { startDate: "desc" },
+    select: { id: true, title: true },
+  });
+}
+
 type PageProps = {
   params: Promise<{ id: string }>;
 };
 
 export default async function TeamPage({ params }: PageProps) {
   const { id } = await params;
-  const [team, availableUsers] = await Promise.all([
+  const [team, availableUsers, challenges] = await Promise.all([
     getTeam(id),
     getAvailableUsers(id),
+    getChallenges(),
   ]);
 
   if (!team) {
     notFound();
   }
 
-  return <TeamDetail team={team} availableUsers={availableUsers} />;
+  return (
+    <TeamDetail
+      team={team}
+      availableUsers={availableUsers}
+      challenges={challenges}
+    />
+  );
 }
