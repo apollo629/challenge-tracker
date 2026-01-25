@@ -99,7 +99,7 @@ export async function POST(request: NextRequest) {
         },
       },
       update: {
-        value: validated.value,
+        value: { increment: validated.value },
       },
       create: {
         userId: validated.userId,

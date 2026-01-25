@@ -215,7 +215,8 @@ export function LogProgressForm({
                   required
                 />
                 <p className="text-sm text-muted-foreground">
-                  If an entry exists for this user and date, it will be updated
+                  If an entry exists for this user and date, the value will be
+                  added to it
                 </p>
               </div>
 
