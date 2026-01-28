@@ -16,14 +16,6 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import {
   AlertDialog,
   AlertDialogAction,
   AlertDialogCancel,
@@ -36,6 +28,17 @@ import {
 } from "@/components/ui/alert-dialog";
 import { format } from "date-fns";
 import { JoinChallengeDialog } from "./join-challenge-dialog";
+import { LeaderboardPodium } from "@/components/leaderboard-podium";
+import { LeaderboardList } from "@/components/leaderboard-list";
+import { RecentActivity } from "@/components/recent-activity";
+
+type Activity = {
+  id: string;
+  userName: string;
+  userId: string;
+  value: number;
+  createdAt: string;
+};
 
 type Challenge = {
   id: string;
@@ -55,7 +58,13 @@ type Challenge = {
   }[];
 };
 
-export function ChallengeDetail({ challenge }: { challenge: Challenge }) {
+export function ChallengeDetail({
+  challenge,
+  recentActivity,
+}: {
+  challenge: Challenge;
+  recentActivity: Activity[];
+}) {
   const router = useRouter();
   const [isEditing, setIsEditing] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -291,49 +300,65 @@ export function ChallengeDetail({ challenge }: { challenge: Challenge }) {
         </CardContent>
       </Card>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Participants</CardTitle>
-          <CardDescription>
-            {challenge.participants.length} participants have logged progress
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          {challenge.participants.length === 0 ? (
-            <p className="text-muted-foreground text-sm">
-              No participants have logged progress yet.
-            </p>
-          ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="w-12">Rank</TableHead>
-                  <TableHead>Name</TableHead>
-                  <TableHead className="text-right">Total Progress</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {sortedParticipants.map((participant, index) => (
-                  <TableRow key={participant.userId}>
-                    <TableCell className="font-medium">{index + 1}</TableCell>
-                    <TableCell>
-                      <Link
-                        href={`/users/${participant.userId}/challenges/${challenge.id}`}
-                        className="hover:underline"
-                      >
-                        {participant.user.name}
-                      </Link>
-                    </TableCell>
-                    <TableCell className="text-right">
-                      {participant.totalValue.toLocaleString()}
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          )}
-        </CardContent>
-      </Card>
+      <div className="grid gap-6 lg:grid-cols-3">
+        <div className="lg:col-span-2">
+          <Card>
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <CardTitle>Leaderboard</CardTitle>
+                <CardDescription>
+                  {challenge.participants.length} participants
+                </CardDescription>
+              </div>
+            </CardHeader>
+            <CardContent>
+              {sortedParticipants.length === 0 ? (
+                <p className="text-muted-foreground text-sm">
+                  No participants have logged progress yet.
+                </p>
+              ) : (
+                <>
+                  <LeaderboardPodium
+                    entries={sortedParticipants.slice(0, 3).map((p, i) => ({
+                      rank: i + 1,
+                      name: p.user.name,
+                      value: p.totalValue,
+                      userId: p.userId,
+                      challengeId: challenge.id,
+                    }))}
+                  />
+                  {sortedParticipants.length > 3 && (
+                    <div className="mt-4">
+                      <LeaderboardList
+                        entries={sortedParticipants.slice(3).map((p, i) => ({
+                          rank: i + 4,
+                          name: p.user.name,
+                          value: p.totalValue,
+                          userId: p.userId,
+                          challengeId: challenge.id,
+                        }))}
+                        maxValue={sortedParticipants[0]?.totalValue ?? 0}
+                      />
+                    </div>
+                  )}
+                </>
+              )}
+            </CardContent>
+          </Card>
+        </div>
+
+        <div>
+          <Card>
+            <CardHeader>
+              <CardTitle>Recent Activity</CardTitle>
+              <CardDescription>Latest progress updates</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <RecentActivity activities={recentActivity} />
+            </CardContent>
+          </Card>
+        </div>
+      </div>
     </div>
   );
 }

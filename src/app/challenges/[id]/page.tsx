@@ -2,6 +2,23 @@ import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { ChallengeDetail } from "./challenge-detail";
 
+async function getRecentActivity(challengeId: string) {
+  const logs = await prisma.progressLog.findMany({
+    where: { challengeId },
+    include: { user: true },
+    orderBy: { createdAt: "desc" },
+    take: 10,
+  });
+
+  return logs.map((log) => ({
+    id: log.id,
+    userName: log.user.name,
+    userId: log.userId,
+    value: log.value,
+    createdAt: log.createdAt.toISOString(),
+  }));
+}
+
 async function getChallenge(id: string) {
   const challenge = await prisma.challenge.findUnique({
     where: { id },
@@ -57,11 +74,16 @@ type PageProps = {
 
 export default async function ChallengePage({ params }: PageProps) {
   const { id } = await params;
-  const challenge = await getChallenge(id);
+  const [challenge, recentActivity] = await Promise.all([
+    getChallenge(id),
+    getRecentActivity(id),
+  ]);
 
   if (!challenge) {
     notFound();
   }
 
-  return <ChallengeDetail challenge={challenge} />;
+  return (
+    <ChallengeDetail challenge={challenge} recentActivity={recentActivity} />
+  );
 }
