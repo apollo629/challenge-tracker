@@ -35,6 +35,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { format } from "date-fns";
+import { JoinChallengeDialog } from "./join-challenge-dialog";
 
 type Challenge = {
   id: string;
@@ -156,8 +157,11 @@ export function ChallengeDetail({ challenge }: { challenge: Challenge }) {
           </div>
           {!isEditing && (
             <div className="flex gap-2">
+              {challenge.status !== "past" && (
+                <JoinChallengeDialog challengeId={challenge.id} />
+              )}
               <Link href={`/challenges/${challenge.id}/log`}>
-                <Button>Log Progress</Button>
+                <Button variant="outline">Log Progress</Button>
               </Link>
               <Link href={`/challenges/${challenge.id}/leaderboard`}>
                 <Button variant="outline">Leaderboard</Button>

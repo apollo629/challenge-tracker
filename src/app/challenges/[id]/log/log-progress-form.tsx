@@ -39,9 +39,11 @@ type User = {
 export function LogProgressForm({
   challenge,
   users,
+  defaultUserId,
 }: {
   challenge: Challenge;
   users: User[];
+  defaultUserId?: string;
 }) {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
@@ -65,7 +67,7 @@ export function LogProgressForm({
   }
 
   const [formData, setFormData] = useState({
-    userId: "",
+    userId: defaultUserId ?? "",
     date: defaultDate,
     value: "",
   });

@@ -16,15 +16,26 @@ async function getUsers() {
 
 type PageProps = {
   params: Promise<{ id: string }>;
+  searchParams: Promise<{ userId?: string }>;
 };
 
-export default async function LogProgressPage({ params }: PageProps) {
+export default async function LogProgressPage({
+  params,
+  searchParams,
+}: PageProps) {
   const { id } = await params;
+  const { userId } = await searchParams;
   const [challenge, users] = await Promise.all([getChallenge(id), getUsers()]);
 
   if (!challenge) {
     notFound();
   }
 
-  return <LogProgressForm challenge={challenge} users={users} />;
+  return (
+    <LogProgressForm
+      challenge={challenge}
+      users={users}
+      defaultUserId={userId}
+    />
+  );
 }
