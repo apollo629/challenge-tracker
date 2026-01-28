@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 
@@ -90,6 +91,7 @@ export async function POST(request: NextRequest) {
       },
     });
 
+    revalidatePath('/');
     return NextResponse.json(challenge, { status: 201 });
   } catch (error) {
     if (error instanceof z.ZodError) {
