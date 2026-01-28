@@ -48,7 +48,7 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    revalidatePath('/');
+    revalidatePath('/', 'layout');
     return NextResponse.json(user, { status: 201 });
   } catch (error) {
     if (error instanceof z.ZodError) {

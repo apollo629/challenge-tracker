@@ -59,7 +59,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
       },
     });
 
-    revalidatePath('/');
+    revalidatePath('/', 'layout');
     return NextResponse.json(user);
   } catch (error) {
     if (error instanceof z.ZodError) {
@@ -85,7 +85,7 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
       where: { id },
     });
 
-    revalidatePath('/');
+    revalidatePath('/', 'layout');
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error("Failed to delete user:", error);

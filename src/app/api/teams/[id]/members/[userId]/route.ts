@@ -34,7 +34,7 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
       },
     });
 
-    revalidatePath('/');
+    revalidatePath('/', 'layout');
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error("Failed to remove member:", error);

@@ -114,7 +114,7 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    revalidatePath('/');
+    revalidatePath('/', 'layout');
     return NextResponse.json(progressLog, { status: 201 });
   } catch (error) {
     if (error instanceof z.ZodError) {
@@ -148,7 +148,7 @@ export async function DELETE(request: NextRequest) {
       where: { id },
     });
 
-    revalidatePath('/');
+    revalidatePath('/', 'layout');
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error("Failed to delete progress log:", error);

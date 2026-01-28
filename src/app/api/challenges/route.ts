@@ -91,7 +91,7 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    revalidatePath('/');
+    revalidatePath('/', 'layout');
     return NextResponse.json(challenge, { status: 201 });
   } catch (error) {
     if (error instanceof z.ZodError) {
