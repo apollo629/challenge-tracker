@@ -19,6 +19,7 @@ model Challenge {
   createdAt   DateTime @default(now())
 
   progressLogs ProgressLog[]
+  activityLogs ActivityLog[]
 }
 
 model User {
@@ -28,6 +29,7 @@ model User {
 
   teamMemberships TeamMember[]
   progressLogs    ProgressLog[]
+  activityLogs    ActivityLog[]
 }
 
 model Team {
@@ -62,4 +64,15 @@ model ProgressLog {
   challenge Challenge @relation(fields: [challengeId], references: [id], onDelete: Cascade)
 
   @@unique([userId, challengeId, date])
+}
+
+model ActivityLog {
+  id          String   @id @default(cuid())
+  userId      String
+  challengeId String
+  value       Float
+  createdAt   DateTime @default(now())
+
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  challenge Challenge @relation(fields: [challengeId], references: [id], onDelete: Cascade)
 }

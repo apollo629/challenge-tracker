@@ -59,7 +59,7 @@ async function getLeaderboard(challengeId: string) {
 }
 
 async function getRecentActivity() {
-  const logs = await prisma.progressLog.findMany({
+  const logs = await prisma.activityLog.findMany({
     include: { user: true, challenge: true },
     orderBy: { createdAt: "desc" },
     take: 10,

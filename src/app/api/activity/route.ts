@@ -10,7 +10,7 @@ export async function GET(request: NextRequest) {
     const where: { challengeId?: string } = {};
     if (challengeId) where.challengeId = challengeId;
 
-    const logs = await prisma.progressLog.findMany({
+    const logs = await prisma.activityLog.findMany({
       where,
       include: {
         user: true,

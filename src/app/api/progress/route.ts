@@ -114,6 +114,15 @@ export async function POST(request: NextRequest) {
       },
     });
 
+    // Create activity log entry for each individual log action
+    await prisma.activityLog.create({
+      data: {
+        userId: validated.userId,
+        challengeId: validated.challengeId,
+        value: validated.value,
+      },
+    });
+
     revalidatePath('/', 'layout');
     return NextResponse.json(progressLog, { status: 201 });
   } catch (error) {

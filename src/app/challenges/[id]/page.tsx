@@ -3,7 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { ChallengeDetail } from "./challenge-detail";
 
 async function getRecentActivity(challengeId: string) {
-  const logs = await prisma.progressLog.findMany({
+  const logs = await prisma.activityLog.findMany({
     where: { challengeId },
     include: { user: true },
     orderBy: { createdAt: "desc" },
